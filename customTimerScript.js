@@ -46,7 +46,6 @@ var label = field.append("text")
   .attr("dy", ".35em");
 
 (function update() {
-  
   field
     .each(function(d) {
     d.previous = d.value, d.value = d.update(timePassed);
@@ -62,7 +61,7 @@ var label = field.append("text")
   else
      label
      .text(function(d) {
-       return d.size - d.value;
+       return Math.ceil((d.size - d.value) / 60);
      });
   if (timePassed <= timeLimit)
     setTimeout(update, 1000 - (timePassed % 1000));
