@@ -1,13 +1,13 @@
 var counterOn = false;
 
 var width = 400,
-    height = 400,
-    timePassed = 0,
-    timeLimit = 300;
+  height = 400,
+  timePassed = 0,
+  timeLimit = 30;
 var fields = [{
   value: timeLimit,
   size: timeLimit,
-  update: function() {
+  update: function () {
     return counterOn ? timePassed = timePassed + 1 : timeLimit;
   }
 }];
@@ -18,11 +18,11 @@ var nilArc = d3.svg.arc()
   .startAngle(0)
   .endAngle(2 * Math.PI);
 
-var arc= d3.svg.arc()
+var arc = d3.svg.arc()
   .innerRadius(width / 3 - 55)
   .outerRadius(width / 3 - 25)
   .startAngle(0)
-  .endAngle(function(d) {
+  .endAngle(function (d) {
     return ((d.value / d.size) * 2 * Math.PI);
   });
 
@@ -49,56 +49,60 @@ var label = field.append("text")
 
 (function update() {
   field
-    .each(function(d) {
-    d.previous = d.value, d.value = d.update(timePassed);
-  });
-  
+    .each(function (d) {
+      d.previous = d.value, d.value = d.update(timePassed);
+    });
+
   path.transition()
     .ease("elastic")
     .duration(1250)
     .attrTween("d", arcTween);
-  
-  if(!counterOn)
-  {
-    console.log(counterOn);
+
+  if (!counterOn) {
     label
-      .text(function() {
+      .text(function () {
         return ":)";
       });
-      setTimeout(update, 1000 - (timePassed % 1000));
+    setTimeout(update, 1000 - (timePassed % 1000));
   }
-  if(counterOn){
+  if (counterOn) {
     if ((timeLimit - timePassed) <= 60)
       pulseText();
     else
       label
-      .text(function(d) {
-        return Math.ceil((d.size - d.value) / 60)  + "m";
-      });
+        .text(function (d) {
+          return Math.ceil((d.size - d.value) / 60) + "m";
+        });
     if (timePassed <= timeLimit)
       setTimeout(update, 1000 - (timePassed % 1000));
     else
-      destroyTimer();
+    {
+      label
+        .text(function () {
+          return "End";
+        });
+        setTimeout(update, 1000 - (timePassed % 1000));
+    }
   }
 })();
 
 function pulseText() {
   back.classed("pulse", true);
   label.classed("pulse", true);
-  
+
   if ((timeLimit - timePassed) >= 0) {
     label.style("font-size", "120px")
-      .attr("transform", "translate(0,"+ +4 +")")
-      .text(function(d) {
-      return d.size - d.value;
-    });
+      .attr("transform", "translate(0," + +4 + ")")
+      .text(function (d) {
+        return d.size - d.value;
+      });
   }
-  
+
   label.transition()
     .ease("elastic")
     .duration(900)
     .style("font-size", "90px")
-    .attr("transform", "translate(0," + -10 +")");
+    .attr("transform", "translate(0," + -10 + ")");
 }
 
 function destroyTimer() {
@@ -107,38 +111,52 @@ function destroyTimer() {
     .duration(700)
     .style("opacity", "0")
     .style("font-size", "5")
-    .attr("transform", "translate(0," + -40 +")")
-    .each("end", function() {
+    .attr("transform", "translate(0," + -40 + ")")
+    .each("end", function () {
       field.selectAll("text").remove()
-  });
-  
+    });
+
   path.transition()
     .ease("back")
     .duration(700)
     .attr("d", nilArc);
-  
+
   back.transition()
     .ease("back")
     .duration(700)
     .attr("d", nilArc)
-    .each("end", function() {
+    .each("end", function () {
       field.selectAll("path").remove()
-  });
+    });
+
+    svg.selectAll("svg").remove();
+}
+
+function recreateTimer() {
+  fields = [{
+    value: timeLimit,
+    size: timeLimit,
+    update: function () {
+      return counterOn ? timePassed = timePassed + 1 : timeLimit;
+    }
+  }];
+  
 }
 
 function arcTween(b) {
   var i = d3.interpolate({
     value: b.previous
   }, b);
-  return function(t) {
+  return function (t) {
     return arc(i(t));
   };
 }
 
-function StartCounter(){
-  if(counterOn){
+function StartCounter() {
+  if (counterOn) {
     timePassed = 0;
     counterOn = false;
+    recreateTimer();
   }
   else
     counterOn = true;
