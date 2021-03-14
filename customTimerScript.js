@@ -136,8 +136,10 @@ function arcTween(b) {
 }
 
 function StartCounter(){
-  if(counterOn)
+  if(counterOn){
+    timePassed = 0;
     counterOn = false;
+  }
   else
     counterOn = true;
 }
