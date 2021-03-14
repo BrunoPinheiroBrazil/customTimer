@@ -56,12 +56,12 @@ var label = field.append("text")
     .duration(500)
     .attrTween("d", arcTween);
   
-  if ((timeLimit - timePassed) <= 10)
+  if ((timeLimit - timePassed) <= 60)
     pulseText();
   else
      label
      .text(function(d) {
-       return Math.ceil((d.size - d.value) / 60);
+       return Math.ceil((d.size - d.value) / 60)  + "m";
      });
   if (timePassed <= timeLimit)
     setTimeout(update, 1000 - (timePassed % 1000));
