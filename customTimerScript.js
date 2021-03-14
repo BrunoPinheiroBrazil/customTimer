@@ -1,3 +1,5 @@
+var counterOn = false;
+
 var width = 400,
     height = 400,
     timePassed = 0,
@@ -6,7 +8,7 @@ var fields = [{
   value: timeLimit,
   size: timeLimit,
   update: function() {
-    return timePassed = timePassed + 1;
+    return counterOn ? timePassed = timePassed + 1 : timeLimit;
   }
 }];
 
@@ -53,20 +55,31 @@ var label = field.append("text")
   
   path.transition()
     .ease("elastic")
-    .duration(500)
+    .duration(1250)
     .attrTween("d", arcTween);
   
-  if ((timeLimit - timePassed) <= 60)
-    pulseText();
-  else
-     label
-     .text(function(d) {
-       return Math.ceil((d.size - d.value) / 60)  + "m";
-     });
-  if (timePassed <= timeLimit)
-    setTimeout(update, 1000 - (timePassed % 1000));
-  else
-    destroyTimer();
+  if(!counterOn)
+  {
+    console.log(counterOn);
+    label
+      .text(function() {
+        return ":)";
+      });
+      setTimeout(update, 1000 - (timePassed % 1000));
+  }
+  if(counterOn){
+    if ((timeLimit - timePassed) <= 60)
+      pulseText();
+    else
+      label
+      .text(function(d) {
+        return Math.ceil((d.size - d.value) / 60)  + "m";
+      });
+    if (timePassed <= timeLimit)
+      setTimeout(update, 1000 - (timePassed % 1000));
+    else
+      destroyTimer();
+  }
 })();
 
 function pulseText() {
@@ -120,4 +133,11 @@ function arcTween(b) {
   return function(t) {
     return arc(i(t));
   };
+}
+
+function StartCounter(){
+  if(counterOn)
+    counterOn = false;
+  else
+    counterOn = true;
 }
